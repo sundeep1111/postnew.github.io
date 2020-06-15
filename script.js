@@ -11,22 +11,35 @@ function getTODOsFromBackend(){
     xhttp.onreadystatechange = function(){
         if(xhttp.readyState === 4){
 
-        
+            
         var response = JSON.parse(xhttp.responseText);
-         console.log(response);
-        for( var i=0; i<response.length; i++){
-           todoList.append(createTodoCard(response[i].message)) 
+        for( let i=0; i<response.length; i++){
+           
+           todoList.append(createTodoCard(response[i].message, response[i].id)) 
+        
         }
+        // var lastid = response[response.length-1];
+        //  count = lastid.id;
+        //  count++
+        // console.log(lastid.id)
+        
     }
 }
 }
 
 getTODOsFromBackend();
 
-function createTodoCard(enteredText) {
+ function abc(){
+    var a=[1,2,3,4,5,6]
+    console.log(a[a.length-1]);
+
+}
+abc()
+
+function createTodoCard(enteredText, id) {
     var mainCard = document.createElement("div");
     mainCard.classList.add("todo-card", "dyndropshadow");
-    mainCard.id = 'todo' + count++;
+    mainCard.id = id;
     var checkInfo = document.createElement("span");
     checkInfo.classList.add("Checkbox");
     var checkbox = document.createElement('input');
@@ -47,7 +60,7 @@ function createTodoCard(enteredText) {
     mainCard.appendChild(checkInfo);
 
     var todoInfo = document.createElement("span");
-    todoInfo.id = 'hello1' + count;
+    todoInfo.id = 'hello1' + id;
     todoInfo.classList.add("fontwidth");
     var todoText = document.createTextNode(enteredText);
     todoInfo.appendChild(todoText);
@@ -71,10 +84,24 @@ function createTodoCard(enteredText) {
     faicon.classList.add("fas", "fa-trash-alt");
     faInfo.appendChild(faicon);
 
-
+    
     faInfo.addEventListener('click', function () {
         var currentcard = document.getElementById(mainCard.id);
         currentcard.remove();
+       // console.log(mainCard.id)
+        let xhttp = new XMLHttpRequest();
+          xhttp.open(
+            'DELETE',
+            'https://5ee248c68b27f30016094891.mockapi.io/todos/' + mainCard.id,
+            'true'
+          );
+          console.log(mainCard.id)
+          xhttp.onreadystatechange = function () {
+            if (this.readyState === 4) {
+                currentcard.remove();
+            }
+          };
+          xhttp.send();
         // for(var i=0; i<obj.length; i++){
         //     if(obj[i].id === mainCard.id){
         //         obj.splice(i,1)
@@ -120,7 +147,7 @@ function handleTODOCreation() {
        
 
         var toobj = {
-            id: 'todo' + count,
+            id: "todo" + count,
             message: enteredText,
             isCompleted:false
         }
@@ -129,12 +156,15 @@ function handleTODOCreation() {
         xhttp.open('POST','https://5ee248c68b27f30016094891.mockapi.io/todos',true)
         xhttp.setRequestHeader('Content-type',"application/json;charset=UTF-8");
         xhttp.send(JSON.stringify(toobj));
+        
         xhttp.onreadystatechange =function(){
             if(xhttp.readyState === 4){
-                todoList.appendChild(createTodoCard(enteredText));
+                todoList.appendChild(createTodoCard(enteredText, count));
                 todoInput.value = "";
             }
         }
+
+        
         // obj.push((toobj));
 
         // localStorage.setItem("todolocal", JSON.stringify(obj))
@@ -146,7 +176,6 @@ function handleTODOCreation() {
 
 btnAddTodo.addEventListener("click", function () {
    handleTODOCreation();
-    console.log(createTodoCard());
 
 });
 
